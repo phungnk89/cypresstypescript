@@ -1,1 +1,1 @@
-# cypresstypescrript
+# cypresstypescript
