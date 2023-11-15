@@ -1,4 +1,3 @@
-import { DatabaseService } from "../../support/database";
 import { ExampleService } from "../../support/stringhelper";
 
 const stringService = new ExampleService();
@@ -6,11 +5,6 @@ const stringService = new ExampleService();
 const email = `cypress.${stringService.generateRandomString(5)}@auto.practice`;
 
 describe("add a new user", () => {
-  before(() => {
-    const databaseService = new DatabaseService();
-    databaseService.cleanUpDB();
-  });
-
   beforeEach(() => {
     cy.fixture("credential").then((credential) => {
       const { admin } = credential;
@@ -26,6 +20,9 @@ describe("add a new user", () => {
   });
 
   it("successfully add a new user", () => {
+    cy.task("cleanUp").then((result) => {
+      expect(result).to.not.equal(-1);
+    });
     cy.get("table tbody tr").should("have.length.greaterThan", 1);
     cy.contains("New User").click();
     cy.get("#firstName").should("be.visible");

@@ -14,7 +14,7 @@ export class DatabaseService {
   private async connect() {
     try {
       const pool = await sql.connect(config);
-      console.log("Connected to the database");
+
       return pool;
     } catch (err) {
       console.error("Error connecting to the database:", err);
@@ -25,22 +25,24 @@ export class DatabaseService {
   private async disconnect(pool: sql.ConnectionPool) {
     try {
       await pool.close();
-      console.log("Disconnected from the database");
     } catch (err) {
       console.error("Error disconnecting from the database:", err);
       throw err;
     }
   }
 
-  public async cleanUpDB() {
+  public async cleanUpDB(): Promise<number> {
     const pool = await this.connect();
 
     try {
       const result = await pool
         .request()
         .query("delete from AspNetUsers where Email like 'cypress%'");
+
+      return result.rowsAffected[0];
     } catch (err) {
       console.error("Error performing database operations:", err);
+      return -1;
     } finally {
       await this.disconnect(pool);
     }
