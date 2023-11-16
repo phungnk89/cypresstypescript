@@ -20,6 +20,13 @@ describe("add a new user", () => {
   });
 
   it("successfully add a new user", () => {
+    cy.task(
+      "queryDB",
+      "select * from AspNetUsers where Email like 'cypress%'"
+    ).then((result) => {
+      let parsedResult = JSON.parse(JSON.stringify(result));
+      expect(parsedResult.UserName).to.contain("cypress");
+    });
     cy.task("cleanUp").then((result) => {
       expect(result).to.not.equal(-1);
     });

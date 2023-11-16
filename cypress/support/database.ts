@@ -1,19 +1,11 @@
 import * as sql from "mssql";
 
-const config = {
-  user: "",
-  password: "",
-  server: "",
-  database: "",
-  options: {
-    encrypt: true,
-  },
-};
-
 export class DatabaseService {
+  public config: any;
+
   private async connect() {
     try {
-      const pool = await sql.connect(config);
+      const pool = await sql.connect(this.config);
 
       return pool;
     } catch (err) {
@@ -43,6 +35,21 @@ export class DatabaseService {
     } catch (err) {
       console.error("Error performing database operations:", err);
       return -1;
+    } finally {
+      await this.disconnect(pool);
+    }
+  }
+
+  public async executeQuery(query: string): Promise<any> {
+    const pool = await this.connect();
+
+    try {
+      const result = await pool.request().query(query);
+
+      return result.recordset[0];
+    } catch (err) {
+      console.error("Error performing database operations:", err);
+      throw err;
     } finally {
       await this.disconnect(pool);
     }
